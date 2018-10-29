@@ -2,51 +2,113 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { hot } from 'react-hot-loader';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styled from 'react-emotion';
+// import styled from 'react-emotion';
 import { connect } from 'react-redux';
-import { Route, Switch, Redirect } from 'react-router-dom';
+// import { Route, Switch, Redirect } from 'react-router-dom';
 import { Notifs } from 'redux-notifications';
-import TopBarProgress from 'react-topbar-progress-indicator';
+// import TopBarProgress from 'react-topbar-progress-indicator';
 import { loadConfig } from 'Actions/config';
 import { loginUser, logoutUser } from 'Actions/auth';
 import { currentBackend } from 'src/backend';
 import { createNewEntry } from 'Actions/collections';
-import { openMediaLibrary } from 'Actions/mediaLibrary';
-import MediaLibrary from 'MediaLibrary/MediaLibrary';
-import { Toast } from 'UI';
-import { Loader, colors } from 'netlify-cms-ui-default';
-import history from 'Routing/history';
+// import { openMediaLibrary } from 'Actions/mediaLibrary';
+// import MediaLibrary from 'MediaLibrary/MediaLibrary';
+// import { Toast } from 'UI';
+// import { Loader, colors } from 'netlify-cms-ui-default';
+// import history from 'Routing/history';
 import { SIMPLE, EDITORIAL_WORKFLOW } from 'Constants/publishModes';
-import Collection from 'Collection/Collection';
-import Workflow from 'Workflow/Workflow';
-import Editor from 'Editor/Editor';
-import NotFoundPage from './NotFoundPage';
-import Header from './Header';
+// import Collection from 'Collection/Collection';
+// import Workflow from 'Workflow/Workflow';
+// import Editor from 'Editor/Editor';
+// import NotFoundPage from './NotFoundPage';
+// import Header from './Header';
 
-TopBarProgress.config({
-  barColors: {
-    '0': colors.active,
-    '1.0': colors.active,
-  },
-  shadowBlur: 0,
-  barThickness: 2,
-});
+import InlineEditor from '@ckeditor/ckeditor5-build-inline';
+import Autosave from '@ckeditor/ckeditor5-autosave/src/autosave';
 
-const AppMainContainer = styled.div`
-  min-width: 800px;
-  max-width: 1440px;
-  margin: 0 auto;
-`;
+// TopBarProgress.config({
+//   barColors: {
+//     '0': colors.active,
+//     '1.0': colors.active,
+//   },
+//   shadowBlur: 0,
+//   barThickness: 2,
+// });
 
-const ErrorContainer = styled.div`
-  margin: 20px;
-`;
+// const AppMainContainer = styled.div`
+//   min-width: 800px;
+//   max-width: 1440px;
+//   margin: 0 auto;
+// `;
 
-const ErrorCodeBlock = styled.pre`
-  margin-left: 20px;
-  font-size: 15px;
-  line-height: 1.5;
-`;
+// const ErrorContainer = styled.div`
+//   margin: 20px;
+// `;
+
+// const ErrorCodeBlock = styled.pre`
+//   margin-left: 20px;
+//   font-size: 15px;
+//   line-height: 1.5;
+// `;
+
+
+// Save the data to a fake HTTP server (emulated here with a setTimeout()).
+function saveData( data ) {
+    return new Promise( resolve => {
+        setTimeout( () => {
+            console.log( 'Saved', data );
+
+            resolve();
+        }, 1 );
+    } );
+}
+
+// Update the "Status: Saving..." info.
+function displayStatus( editor ) {
+    // const pendingActions = editor.plugins.get( 'PendingActions' );
+    // const statusIndicator = document.querySelector( '#editor-status' );
+
+    // pendingActions.on( 'change:hasAny', ( evt, propertyName, newValue ) => {
+    //     if ( newValue ) {
+    //         statusIndicator.classList.add( 'busy' );
+    //     } else {
+    //         statusIndicator.classList.remove( 'busy' );
+    //     }
+    // } );
+}
+
+function initEditor() {
+  console.log("initEditor")
+  let editables = document.querySelectorAll( '.editable' );
+  for (var i = 0; i < editables.length; ++i) {
+    InlineEditor
+    .create( editables[i], {
+        plugins: [
+            Autosave,
+            // ... other plugins
+        ],
+
+        autosave: {
+            save( editor ) {
+                return saveData( editor.getData() );
+            }
+        },
+        // ... other configuration options
+    } )
+    .then( editor => {
+      (window.editors = window.editors || []).push(editor);
+
+      console.log( 'Editor was initialized', editor );
+
+      // displayStatus( editor );
+
+    } )
+    .catch( err => {
+      console.error( err.stack );
+    } );
+  }
+}
+
 
 class App extends React.Component {
   static propTypes = {
@@ -59,27 +121,25 @@ class App extends React.Component {
     user: ImmutablePropTypes.map,
     isFetching: PropTypes.bool.isRequired,
     publishMode: PropTypes.oneOf([SIMPLE, EDITORIAL_WORKFLOW]),
-    siteId: PropTypes.string,
-    useMediaLibrary: PropTypes.bool,
-    openMediaLibrary: PropTypes.func.isRequired,
-    showMediaButton: PropTypes.bool,
+    siteId: PropTypes.string
   };
 
   static configError(config) {
     return (
-      <ErrorContainer>
+      <div>
         <h1>Error loading the CMS configuration</h1>
 
         <div>
           <strong>Config Errors:</strong>
-          <ErrorCodeBlock>{config.get('error')}</ErrorCodeBlock>
+          <pre>{config.get('error')}</pre>
           <span>Check your config.yml file.</span>
         </div>
-      </ErrorContainer>
+      </div>
     );
   }
 
   componentDidMount() {
+    console.log("componentDidMount")
     const { loadConfig } = this.props;
     loadConfig();
   }
@@ -89,6 +149,7 @@ class App extends React.Component {
   }
 
   authenticating() {
+    console.log("authenticating")
     const { auth } = this.props;
     const backend = currentBackend(this.props.config);
 
@@ -102,7 +163,7 @@ class App extends React.Component {
 
     return (
       <div>
-        <Notifs CustomComponent={Toast} />
+        <Notifs />
         {React.createElement(backend.authComponent(), {
           onLogin: this.handleLogin.bind(this),
           error: auth && auth.get('error'),
@@ -112,7 +173,6 @@ class App extends React.Component {
           base_url: this.props.config.getIn(['backend', 'base_url'], null),
           authEndpoint: this.props.config.getIn(['backend', 'auth_endpoint']),
           config: this.props.config,
-          clearHash: () => history.replace('/'),
         })}
       </div>
     );
@@ -129,11 +189,7 @@ class App extends React.Component {
       config,
       collections,
       logoutUser,
-      isFetching,
-      publishMode,
-      useMediaLibrary,
-      openMediaLibrary,
-      showMediaButton,
+      isFetching
     } = this.props;
 
     if (config === null) {
@@ -141,56 +197,28 @@ class App extends React.Component {
     }
 
     if (config.get('error')) {
+      console.log("error")
       return App.configError(config);
     }
 
     if (config.get('isFetching')) {
-      return <Loader active>Loading configuration...</Loader>;
+      console.log("isFetching")
+      // return <Loader active>Loading configuration...</Loader>;
+      return <p>Loading configuration...</p>;
     }
 
     if (user == null) {
       return this.authenticating();
     }
 
+    initEditor();
+
     const defaultPath = `/collections/${collections.first().get('name')}`;
-    const hasWorkflow = publishMode === EDITORIAL_WORKFLOW;
 
     return (
-      <div>
-        <Notifs CustomComponent={Toast} />
-        <Header
-          user={user}
-          collections={collections}
-          onCreateEntryClick={createNewEntry}
-          onLogoutClick={logoutUser}
-          openMediaLibrary={openMediaLibrary}
-          hasWorkflow={hasWorkflow}
-          displayUrl={config.get('display_url')}
-          showMediaButton={showMediaButton}
-        />
-        <AppMainContainer>
-          {isFetching && <TopBarProgress />}
-          <div>
-            <Switch>
-              <Redirect exact from="/" to={defaultPath} />
-              <Redirect exact from="/search/" to={defaultPath} />
-              {hasWorkflow ? <Route path="/workflow" component={Workflow} /> : null}
-              <Route exact path="/collections/:name" component={Collection} />
-              <Route
-                path="/collections/:name/new"
-                render={props => <Editor {...props} newRecord />}
-              />
-              <Route path="/collections/:name/entries/:slug" component={Editor} />
-              <Route
-                path="/search/:searchTerm"
-                render={props => <Collection {...props} isSearchResults />}
-              />
-              <Route component={NotFoundPage} />
-            </Switch>
-            {useMediaLibrary ? <MediaLibrary /> : null}
-          </div>
-        </AppMainContainer>
-      </div>
+        <div className="App">
+            <h2>Using CKEditor 5</h2>
+        </div>
     );
   }
 }
@@ -199,23 +227,16 @@ function mapStateToProps(state) {
   const { auth, config, collections, globalUI, mediaLibrary } = state;
   const user = auth && auth.get('user');
   const isFetching = globalUI.get('isFetching');
-  const publishMode = config && config.get('publish_mode');
-  const useMediaLibrary = !mediaLibrary.get('externalLibrary');
-  const showMediaButton = mediaLibrary.get('showMediaButton');
   return {
     auth,
     config,
     collections,
     user,
-    isFetching,
-    publishMode,
-    showMediaButton,
-    useMediaLibrary,
+    isFetching
   };
 }
 
 const mapDispatchToProps = {
-  openMediaLibrary,
   loadConfig,
   loginUser,
   logoutUser,

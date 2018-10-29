@@ -27,22 +27,7 @@
     "netlify-cms-backend-github": "^2.0.9",
     "netlify-cms-backend-gitlab": "^2.0.6",
     "netlify-cms-backend-test": "^2.0.6",
-    "netlify-cms-core": "^2.1.1",
-    "netlify-cms-editor-component-image": "^2.0.4",
-    "netlify-cms-media-library-uploadcare": "^0.2.0",
-    "netlify-cms-widget-boolean": "^2.0.4",
-    "netlify-cms-widget-date": "^2.0.5",
-    "netlify-cms-widget-datetime": "^2.0.5",
-    "netlify-cms-widget-file": "^2.1.0",
-    "netlify-cms-widget-image": "^2.1.0",
-    "netlify-cms-widget-list": "^2.0.6",
-    "netlify-cms-widget-markdown": "^2.0.8",
-    "netlify-cms-widget-number": "^2.0.5",
-    "netlify-cms-widget-object": "^2.0.5",
-    "netlify-cms-widget-relation": "^2.0.5",
-    "netlify-cms-widget-select": "^2.0.4",
-    "netlify-cms-widget-string": "^2.0.4",
-    "netlify-cms-widget-text": "^2.0.5"
+    "netlify-cms-core": "^2.1.1"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^4.5.2",

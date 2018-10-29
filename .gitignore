@@ -14,3 +14,5 @@ cypress/videos
 /coverage/
 .cache
 *.log
+*sublime-project
+*sublime-workspace
