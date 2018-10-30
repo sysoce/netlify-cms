@@ -61,7 +61,7 @@ function bootstrap(opts = {}) {
    */
   const Root = () => (
       <Provider store={store}>
-        <App></App>
+        <App />
       </Provider>
   );
 

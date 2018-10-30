@@ -92,5 +92,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "private": true
+  "private": true,
+  "dependencies": {}
 }

@@ -23,8 +23,7 @@ import { SIMPLE, EDITORIAL_WORKFLOW } from 'Constants/publishModes';
 // import NotFoundPage from './NotFoundPage';
 // import Header from './Header';
 
-import InlineEditor from '@ckeditor/ckeditor5-build-inline';
-import Autosave from '@ckeditor/ckeditor5-autosave/src/autosave';
+import Editor from '../../../../editor';
 
 // TopBarProgress.config({
 //   barColors: {
@@ -50,64 +49,6 @@ import Autosave from '@ckeditor/ckeditor5-autosave/src/autosave';
 //   font-size: 15px;
 //   line-height: 1.5;
 // `;
-
-
-// Save the data to a fake HTTP server (emulated here with a setTimeout()).
-function saveData( data ) {
-    return new Promise( resolve => {
-        setTimeout( () => {
-            console.log( 'Saved', data );
-
-            resolve();
-        }, 1 );
-    } );
-}
-
-// Update the "Status: Saving..." info.
-function displayStatus( editor ) {
-    // const pendingActions = editor.plugins.get( 'PendingActions' );
-    // const statusIndicator = document.querySelector( '#editor-status' );
-
-    // pendingActions.on( 'change:hasAny', ( evt, propertyName, newValue ) => {
-    //     if ( newValue ) {
-    //         statusIndicator.classList.add( 'busy' );
-    //     } else {
-    //         statusIndicator.classList.remove( 'busy' );
-    //     }
-    // } );
-}
-
-function initEditor() {
-  console.log("initEditor")
-  let editables = document.querySelectorAll( '.editable' );
-  for (var i = 0; i < editables.length; ++i) {
-    InlineEditor
-    .create( editables[i], {
-        plugins: [
-            Autosave,
-            // ... other plugins
-        ],
-
-        autosave: {
-            save( editor ) {
-                return saveData( editor.getData() );
-            }
-        },
-        // ... other configuration options
-    } )
-    .then( editor => {
-      (window.editors = window.editors || []).push(editor);
-
-      console.log( 'Editor was initialized', editor );
-
-      // displayStatus( editor );
-
-    } )
-    .catch( err => {
-      console.error( err.stack );
-    } );
-  }
-}
 
 
 class App extends React.Component {
@@ -211,7 +152,7 @@ class App extends React.Component {
       return this.authenticating();
     }
 
-    initEditor();
+    window.editor = new Editor;
 
     const defaultPath = `/collections/${collections.first().get('name')}`;
 

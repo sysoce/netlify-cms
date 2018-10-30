@@ -19,8 +19,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@ckeditor/ckeditor5-autosave": "^10.0.1",
-    "@ckeditor/ckeditor5-build-inline": "^11.1.1",
     "ajv": "^6.4.0",
     "ajv-errors": "^1.0.0",
     "create-react-class": "^15.6.0",
