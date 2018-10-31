@@ -1,6 +1,17 @@
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 
-const EDITOR_SELECTOR = '[data-editable]';
+const EDITABLE_SELECTOR = '.editable';
+const COLLECTION = 'collection';
+const SLUG = 'slug';
+
+function getIdentifier(el) {
+	var id = {};
+	if(el && el.dataset) {
+		id.collection = el.dataset[COLLECTION];
+	  	id.slug = el.dataset[SLUG];
+	}
+  	return id;
+}
 
 // Save the data to a fake HTTP server (emulated here with a setTimeout()).
 export function saveData( id, data ) {
@@ -17,8 +28,12 @@ export default class Editor {
 
 	constructor() {
 	  console.log("initEditor")
-	  let editables = document.querySelectorAll( EDITOR_SELECTOR );
+	  let editables = document.querySelectorAll( EDITABLE_SELECTOR );
 	  for (var i = 0; i < editables.length; ++i) {
+
+	  	let id = getIdentifier(editor.element);
+	  	if(!id.collection || !id.slug) continue;
+
 	    InlineEditor
 	    .create( editables[i])
 	    .then( editor => {
@@ -32,7 +47,7 @@ export default class Editor {
 			    if ( !isFocused ) {
 			    	console.log( 'Blur editor' );
 			        // Do whatever you want with current editor data:
-			        saveData( editor.element.dataset.editable, editor.getData() );
+			        saveData( id, editor.getData() );
 			    }
 			});
 
