@@ -1,23 +1,33 @@
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 
-const EDITABLE_SELECTOR = '.editable';
-const COLLECTION = 'collection';
-const SLUG = 'slug';
+const IDENTIFIER = 'identifier';
+const SELECTOR = '[data-' + IDENTIFIER + ']';
 
 function getIdentifier(el) {
 	var id = {};
 	if(el && el.dataset) {
-		id.collection = el.dataset[COLLECTION];
-	  	id.slug = el.dataset[SLUG];
+		console.log(el.dataset[IDENTIFIER])
+		id = JSON.parse(el.dataset[IDENTIFIER]);
 	}
   	return id;
 }
 
 // Save the data to a fake HTTP server (emulated here with a setTimeout()).
-export function saveData( id, data ) {
+export function saveData(backend, collections, id, data ) {
     return new Promise( resolve => {
         setTimeout( () => {
             console.log( 'Saved ' + id, data );
+            const collection = collections.get(id.collection);
+            console.log(collection)
+
+            if (!id.slug) {
+		      backend.createEmptyDraft(collection);
+		    } else {
+		      backend.loadEntry(collection, id.slug);
+		    }
+		    backend.changeDraftField(id.field, data, null);
+
+            backend.persistEntry(collection);
 
             resolve();
         }, 1 );
@@ -26,37 +36,41 @@ export function saveData( id, data ) {
 
 export default class Editor {
 
-	constructor() {
-	  console.log("initEditor")
-	  let editables = document.querySelectorAll( EDITABLE_SELECTOR );
-	  for (var i = 0; i < editables.length; ++i) {
+	constructor(backend, collections) {
+		this.backend = backend;
+		this.collections = collections;
 
-	  	let id = getIdentifier(editor.element);
-	  	if(!id.collection || !id.slug) continue;
+	  	console.log("initEditor")
+	  	let elements = document.querySelectorAll( SELECTOR );
+	  	for (var i = 0; i < elements.length; ++i) {
 
-	    InlineEditor
-	    .create( editables[i])
-	    .then( editor => {
-			(window.editors = window.editors || []).push(editor);
+	  		let id = getIdentifier(elements[i]);
+	  		console.log("identifier", id)
+	  		if(!id.collection || !id.field) continue;
 
-			editor.model.document.on( 'change:data', () => {
-				console.log( 'The data has changed!' );
-			} );
+		    InlineEditor
+		    .create( elements[i])
+		    .then( editor => {
+				(window.editors = window.editors || []).push(editor);
 
-		  	editor.ui.focusTracker.on( 'change:isFocused', ( evt, name, isFocused ) => {
-			    if ( !isFocused ) {
-			    	console.log( 'Blur editor' );
-			        // Do whatever you want with current editor data:
-			        saveData( id, editor.getData() );
-			    }
-			});
+				editor.model.document.on( 'change:data', () => {
+					console.log( 'The data has changed!' );
+				} );
 
-	      	console.log( 'Editor was initialized', editor );
+			  	editor.ui.focusTracker.on( 'change:isFocused', ( evt, name, isFocused ) => {
+				    if ( !isFocused ) {
+				    	console.log( 'Blur editor' );
+				        // Do whatever you want with current editor data:
+				        saveData(backend, collections, id, editor.getData() );
+				    }
+				});
 
-	    } )
-	    .catch( err => {
-	      console.error( err.stack );
-	    } );
-	  }
+		      	console.log( 'Editor was initialized', editor );
+
+		    } )
+		    .catch( err => {
+		      console.error( err.stack );
+		    } );
+	  	}
 	}
 }

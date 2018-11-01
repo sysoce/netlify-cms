@@ -24,6 +24,17 @@ import { SIMPLE, EDITORIAL_WORKFLOW } from 'Constants/publishModes';
 // import Header from './Header';
 
 import Editor from '../../../../editor';
+import {
+  loadEntry,
+  loadEntries,
+  createDraftFromEntry,
+  createEmptyDraft,
+  discardDraft,
+  changeDraftField,
+  changeDraftFieldValidation,
+  persistEntry,
+  deleteEntry,
+} from 'Actions/entries';
 
 // TopBarProgress.config({
 //   barColors: {
@@ -152,7 +163,13 @@ class App extends React.Component {
       return this.authenticating();
     }
 
-    window.editor = new Editor;
+    var editorActions = {
+      createEmptyDraft,
+      loadEntry,
+      changeDraftField,
+      persistEntry
+    };
+    window.editor = new Editor(editorActions, collections);
 
     const defaultPath = `/collections/${collections.first().get('name')}`;
 

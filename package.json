@@ -63,6 +63,7 @@
     "babel-plugin-transform-export-extensions": "^6.22.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "cache-me-outside": "^0.0.4",
+    "chokidar": "^2.0.4",
     "cross-env": "^5.1.4",
     "cypress": "^3.0.3",
     "deep-equal": "^1.0.1",
@@ -93,5 +94,10 @@
     "packages/*"
   ],
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "piping": "^1.0.0-rc.4"
+  },
+  "optionalDependencies": {
+    "fsevents": "^1.2.4"
+  }
 }
