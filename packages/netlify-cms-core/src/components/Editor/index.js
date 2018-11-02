@@ -15,19 +15,19 @@ import {
 const COLLECTION = 'collection';
 const SLUG = 'slug';
 const FIELD = 'field';
-const NEW = 'new';
+const NEW_ENTRY = 'new';
 const EDITABLE = FIELD;
 
 export default class Editor {
 
-	getIdentifier(el) {
-		var id = {};
+	getEntryData(el) {
+		var entryData = {};
 		if(el && el.dataset) {
-			id.collection = el.dataset[COLLECTION];
-			id.slug = el.dataset[SLUG];
-			id.new = el.dataset[NEW];
+			entryData.collection = el.dataset[COLLECTION];
+			entryData.slug = el.dataset[SLUG];
+			entryData.newEntry = el.dataset[NEW_ENTRY];
 		}
-	  	return id;
+	  	return entryData;
 	}
 
 	getField(el) {
@@ -49,11 +49,14 @@ export default class Editor {
 	initEditor() {
 		console.log("initEditor")
 	  	let elements = this.getElements( COLLECTION );
+	  	console.log(elements)
 	  	for (var i = 0; i < elements.length; ++i) {
+	  		console.log("loop i" + i)
 
-	  		let id = this.getIdentifier(elements[i]);
-	  		console.log("identifier", id)
-	  		if(!id.collection) continue;
+	  		let entryData = this.getEntryData(elements[i]);
+	  		console.log("identifier", entryData)
+	  		if(!entryData.collection || !entryData.slug) continue;
+	  		this.entries[entryData.slug] = this.entries[entryData.slug] || entryData;
 
 	  		let editables;
 	  		if(this.isEditable(elements[i])) {
@@ -62,22 +65,17 @@ export default class Editor {
 	  			editables = this.getElements( EDITABLE, elements[i] );
 	  		}
 
-	  		for (var i = 0; i < editables.length; i++) {
-	  			let field = this.getField(editables[i]);
+	  		for (var j = 0; j < editables.length; j++) {
+	  			let field = this.getField(editables[j]);
 	  			if(!field) continue;
 			    InlineEditor
-			    .create( editables[i])
+			    .create( editables[j])
 			    .then( editor => {
 			    	editor.field = field;
-			    	editor.collection = id.collection;
-			    	editor.slug = id.slug;
-			    	editor.new = id.new;
-			    	editor.savedData = editor.getData();
+			    	editor.entry = entryData.slug;
+			    	if(!entryData.newEntry) editor.savedData = editor.getData();
+			    	else editor.savedData = '';
 					(window.editors = window.editors || []).push(editor);
-
-					// editor.model.document.on( 'change:data', () => {
-					// 	console.log( 'The data has changed!' );
-					// } );
 
 				  	editor.ui.focusTracker.on( 'change:isFocused', ( evt, name, isFocused ) => {
 					    if ( !isFocused ) {
@@ -102,31 +100,35 @@ export default class Editor {
 	saveData(editor) {
 		var app = this;
 		var data = editor.getData();
+		var entryData = this.entries[editor.entry];
 		let isString = typeof data === 'string' || data instanceof String;
-	    if(isString && ( editor.new || editor.savedData.localeCompare(data) )) {
+	    if(isString && editor.savedData.localeCompare(data)) {
 
             console.log( 'Saving ' + editor.field );
-            const collection = app.getCollectionByName(editor.collection);
+            const collection = app.getCollectionByName(entryData.collection);
             console.log(collection)
 
-            if (editor.new) {
-            	console.log("new")
+            if (entryData.newEntry) {
+            	console.log("newEntry")
 		      	store.dispatch(createEmptyDraft(collection));
 		    } else {
 		    	console.log("load")
-	      		store.dispatch(loadEntry(collection, editor.slug));
+	      		store.dispatch(loadEntry(collection, entryData.slug));
 		    }
-		    store.dispatch(changeDraftField('title', editor.slug, null));
+		    store.dispatch(changeDraftField('title', entryData.slug, null));
 		    store.dispatch(changeDraftField(editor.field, data, null));
 
             store.dispatch(persistEntry(collection));
-            editor.new = false;
+            editor.savedData = data;
+            entryData.newEntry = false;
         }
 
 	}
 
 	constructor() {
 		this.store = store;
+		this.entries = {};
+
 		this.initEditor();
 	}
 }
