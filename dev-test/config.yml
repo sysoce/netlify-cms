@@ -3,7 +3,7 @@ backend:
 
 display_url: https://example.com
 
-publish_mode: editorial_workflow
+# publish_mode: editorial_workflow
 media_folder: assets/uploads
 
 collections: # A list of collections the CMS should be able to edit
@@ -14,10 +14,11 @@ collections: # A list of collections the CMS should be able to edit
       The description is a great place for tone setting, high level information, and editing
       guidelines that are specific to a collection.
     folder: "_posts"
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{slug}}"
     create: true # Allow users to create new documents in this collection
     fields: # The fields each document in this collection have
-      - {label: "Title", name: "title", widget: "string", tagname: "h1"}
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Heading", name: "heading", widget: "string", tagname: "h1"}
       - {label: "Body", name: "body", widget: "markdown", hint: "Main content goes here."}
 
   # - name: "faq" # Used in routes, ie.: /admin/collections/:slug/edit

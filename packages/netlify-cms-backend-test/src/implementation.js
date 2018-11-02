@@ -148,6 +148,7 @@ export default class TestRepo {
   persistEntry({ path, raw, slug }, mediaFiles, options = {}) {
     console.log("persistEntry path: " + path + "  slug: " + slug, raw )
     if (options.useWorkflow) {
+      console.log("workflow")
       const unpubStore = window.repoFilesUnpublished;
       const existingEntryIndex = unpubStore.findIndex(e => e.file.path === path);
       if (existingEntryIndex >= 0) {
@@ -173,7 +174,7 @@ export default class TestRepo {
       }
       return Promise.resolve();
     }
-
+    console.log("persistEntry")
     const newEntry = options.newEntry || false;
     const folder = path.substring(0, path.lastIndexOf('/'));
     const fileName = path.substring(path.lastIndexOf('/') + 1);
@@ -184,6 +185,7 @@ export default class TestRepo {
     } else {
       window.repoFiles[folder][fileName].content = raw;
     }
+    console.log(window.repoFiles)
     return Promise.resolve();
   }
 

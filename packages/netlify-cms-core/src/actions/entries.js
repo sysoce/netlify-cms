@@ -359,7 +359,6 @@ export function traverseCollectionCursor(collection, action) {
 }
 
 export function createEmptyDraft(collection) {
-  console.log("createEmptyDraft", collection )
   return dispatch => {
     const dataFields = {};
     collection.get('fields', List()).forEach(field => {
@@ -371,7 +370,6 @@ export function createEmptyDraft(collection) {
 }
 
 export function persistEntry(collection) {
-  console.log("persistEntry", collection )
   return (dispatch, getState) => {
     const state = getState();
     const entryDraft = state.entryDraft;
@@ -402,7 +400,6 @@ export function persistEntry(collection) {
     }
 
     const backend = currentBackend(state.config);
-    console.log("persistEntry2", backend )
     const assetProxies = entryDraft.get('mediaFiles').map(path => getAsset(state, path));
     const entry = entryDraft.get('entry');
 
