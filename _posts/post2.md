@@ -1,4 +1,4 @@
 ---
 title: post2
 ---
-<p>Test</p>
+<p>Paragraph with some text 2.</p>
