@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { hot } from 'react-hot-loader';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-// import styled from 'react-emotion';
+import styled from 'react-emotion';
 import { connect } from 'react-redux';
 // import { Route, Switch, Redirect } from 'react-router-dom';
 import { Notifs } from 'redux-notifications';
