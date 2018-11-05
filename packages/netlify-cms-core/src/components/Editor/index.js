@@ -97,6 +97,10 @@ export default class Editor {
 		return store.getState().collections.get(name);
 	}
 
+	getUser(name) {
+		return store.getState().auth.get('user');
+	}
+
 	saveData(editor) {
 		var app = this;
 		var data = editor.getData();
@@ -111,11 +115,12 @@ export default class Editor {
             if (entryData.newEntry) {
             	console.log("newEntry")
 		      	store.dispatch(createEmptyDraft(collection));
+		      	store.dispatch(changeDraftField('title', entryData.slug, null));
 		    } else {
 		    	console.log("load")
 	      		store.dispatch(loadEntry(collection, entryData.slug));
 		    }
-		    store.dispatch(changeDraftField('title', entryData.slug, null));
+
 		    store.dispatch(changeDraftField(editor.field, data, null));
 
             store.dispatch(persistEntry(collection));
@@ -126,9 +131,32 @@ export default class Editor {
 	}
 
 	constructor() {
-		this.store = store;
-		this.entries = {};
+		// const { collections, entryDraft, auth, config, entries } = state;
+		// const slug = ownProps.match.params.slug;
+		// const collection = collections.get(ownProps.match.params.name);
+		// const collectionName = collection.get('name');
+		// const newEntry = ownProps.newRecord === true;
+		// const fields = selectFields(collection, slug);
+		// const entry = newEntry ? null : selectEntry(state, collectionName, slug);
+		// const boundGetAsset = getAsset.bind(null, state);
+		// this.user = auth && auth.get('user');
+		// const hasChanged = entryDraft.get('hasChanged');
+		// const displayUrl = config.get('display_url');
+		// const hasWorkflow = config.get('publish_mode') === EDITORIAL_WORKFLOW;
+		// const isModification = entryDraft.getIn(['entry', 'isModification']);
+		// const collectionEntriesLoaded = !!entries.getIn(['entities', collectionName]);
+		// const unpublishedEntry = selectUnpublishedEntry(state, collectionName, slug);
+		// const currentStatus = unpublishedEntry && unpublishedEntry.getIn(['metaData', 'status']);
 
-		this.initEditor();
+		// this.store = store;
+
+		if (this.getUser() == null) {
+	      return;
+	    }
+
+		if(!window.editors) {
+			this.entries = {};
+			this.initEditor();
+		}
 	}
 }

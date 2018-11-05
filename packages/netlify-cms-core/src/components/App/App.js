@@ -50,6 +50,13 @@ import Editor from 'Editor';
 //   line-height: 1.5;
 // `;
 
+const AuthBlock = styled.div`
+  position: absolute;
+  width: 100% !important;
+  height: 100% !important;
+  text-align: center;
+  background-color: #eff0f4;
+`;
 
 class App extends React.Component {
   static propTypes = {
@@ -103,7 +110,7 @@ class App extends React.Component {
     }
 
     return (
-      <div>
+      <AuthBlock>
         <Notifs />
         {React.createElement(backend.authComponent(), {
           onLogin: this.handleLogin.bind(this),
@@ -115,7 +122,7 @@ class App extends React.Component {
           authEndpoint: this.props.config.getIn(['backend', 'auth_endpoint']),
           config: this.props.config,
         })}
-      </div>
+      </AuthBlock>
     );
   }
 
