@@ -10,7 +10,7 @@ import { Notifs } from 'redux-notifications';
 import { loadConfig } from 'Actions/config';
 import { loginUser, logoutUser } from 'Actions/auth';
 import { currentBackend } from 'src/backend';
-import { createNewEntry } from 'Actions/collections';
+// import { createNewEntry } from 'Actions/collections';
 // import { openMediaLibrary } from 'Actions/mediaLibrary';
 // import MediaLibrary from 'MediaLibrary/MediaLibrary';
 // import { Toast } from 'UI';

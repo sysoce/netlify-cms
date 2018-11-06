@@ -2,12 +2,10 @@ import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import store from 'Redux';
 import {
   loadEntry,
-  loadEntries,
   createDraftFromEntry,
   createEmptyDraft,
   discardDraft,
   changeDraftField,
-  changeDraftFieldValidation,
   persistEntry,
   deleteEntry,
 } from 'Actions/entries';
