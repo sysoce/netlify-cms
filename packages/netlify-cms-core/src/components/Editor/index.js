@@ -13,7 +13,7 @@ import {
 const COLLECTION = 'collection';
 const SLUG = 'slug';
 const FIELD = 'field';
-const NEW_ENTRY = 'new';
+const SAVED = 'saved';
 const EDITABLE = FIELD;
 
 export default class Editor {
@@ -21,9 +21,11 @@ export default class Editor {
 	getEntryData(el) {
 		var entryData = {};
 		if(el && el.dataset) {
+			entryData.element = el;
 			entryData.collection = el.dataset[COLLECTION];
 			entryData.slug = el.dataset[SLUG];
-			entryData.newEntry = el.dataset[NEW_ENTRY];
+			entryData.saved = el.dataset[SAVED];
+			if(el.dataset[EDITABLE]) entryData.field = el.dataset[FIELD];
 		}
 	  	return entryData;
 	}
@@ -57,7 +59,7 @@ export default class Editor {
 	  		this.entries[entryData.slug] = this.entries[entryData.slug] || entryData;
 
 	  		let editables;
-	  		if(this.isEditable(elements[i])) {
+	  		if(entryData.field) {
 	  			editables = [ elements[i] ];
 	  		} else {
 	  			editables = this.getElements( EDITABLE, elements[i] );
@@ -71,7 +73,7 @@ export default class Editor {
 			    .then( editor => {
 			    	editor.field = field;
 			    	editor.entry = entryData.slug;
-			    	if(!entryData.newEntry) editor.savedData = editor.getData();
+			    	if(entryData.saved) editor.savedData = editor.getData();
 			    	else editor.savedData = '';
 					(window.editors = window.editors || []).push(editor);
 
@@ -110,20 +112,21 @@ export default class Editor {
             const collection = app.getCollectionByName(entryData.collection);
             console.log(collection)
 
-            if (entryData.newEntry) {
-            	console.log("newEntry")
+            if (entryData.saved) {
+            	console.log("loaing entry..")
+	      		store.dispatch(loadEntry(collection, entryData.slug));
+		    } else {
+	      		console.log("creating new entry..")
 		      	store.dispatch(createEmptyDraft(collection));
 		      	store.dispatch(changeDraftField('title', entryData.slug, null));
-		    } else {
-		    	console.log("load")
-	      		store.dispatch(loadEntry(collection, entryData.slug));
 		    }
 
 		    store.dispatch(changeDraftField(editor.field, data, null));
 
             store.dispatch(persistEntry(collection));
             editor.savedData = data;
-            entryData.newEntry = false;
+            entryData.saved = true;
+            console.log("Saved entry.")
         }
 
 	}
@@ -133,9 +136,9 @@ export default class Editor {
 		// const slug = ownProps.match.params.slug;
 		// const collection = collections.get(ownProps.match.params.name);
 		// const collectionName = collection.get('name');
-		// const newEntry = ownProps.newRecord === true;
+		// const saved = ownProps.newRecord === false;
 		// const fields = selectFields(collection, slug);
-		// const entry = newEntry ? null : selectEntry(state, collectionName, slug);
+		// const entry = saved ? null : selectEntry(state, collectionName, slug);
 		// const boundGetAsset = getAsset.bind(null, state);
 		// this.user = auth && auth.get('user');
 		// const hasChanged = entryDraft.get('hasChanged');
