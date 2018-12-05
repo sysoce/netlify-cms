@@ -1,5 +1,5 @@
 ---
 title: post1
-heading: <p>test github</p>
+heading: <p>test 1</p>
 ---
 
