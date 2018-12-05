@@ -1,11 +1,11 @@
 import { Map } from 'immutable';
 import { actions as notifActions } from 'redux-notifications';
-import { currentBackend } from 'src/backend';
-import { createAssetProxy } from 'ValueObjects/AssetProxy';
-import { selectIntegration } from 'Reducers';
-import { getIntegrationProvider } from 'Integrations';
+import { currentBackend } from '../backend';
+import { createAssetProxy } from '../valueObjects/AssetProxy';
+import { selectIntegration } from '../reducers';
+import { getIntegrationProvider } from '../integrations';
 import { addAsset } from './media';
-import { sanitizeSlug } from 'Lib/urlHelper';
+import { sanitizeSlug } from '../lib/urlHelper';
 
 const { notifSend } = notifActions;
 
@@ -63,8 +63,8 @@ export function openMediaLibrary(payload = {}) {
     const state = getState();
     const mediaLibrary = state.mediaLibrary.get('externalLibrary');
     if (mediaLibrary) {
-      const { controlID: id, value, config = Map(), allowMultiple, forImage } = payload;
-      mediaLibrary.show({ id, value, config: config.toJS(), allowMultiple, imagesOnly: forImage });
+      const { controlID: id, value, config = Map(), forImage } = payload;
+      mediaLibrary.show({ id, value, config: config.toJS(), imagesOnly: forImage });
     }
     dispatch({ type: MEDIA_LIBRARY_OPEN, payload });
   };
@@ -164,7 +164,10 @@ export function persistMedia(file, opts = {}) {
       console.error(error);
       dispatch(
         notifSend({
-          message: `Failed to persist media: ${error}`,
+          message: {
+            details: error,
+            key: 'ui.toast.onFailToPersistMedia',
+          },
           kind: 'danger',
           dismissAfter: 8000,
         }),
@@ -173,6 +176,17 @@ export function persistMedia(file, opts = {}) {
     }
   };
 }
+
+const failToDeleteMediaNotification = (details) => {
+  return {
+    message: {
+      details: details,
+      key: 'ui.toast.onFailToDeleteMedia',
+    },
+    kind: 'danger',
+    dismissAfter: 8000,
+  };
+};
 
 export function deleteMedia(file, opts = {}) {
   const { privateUpload } = opts;
@@ -191,11 +205,7 @@ export function deleteMedia(file, opts = {}) {
         .catch(error => {
           console.error(error);
           dispatch(
-            notifSend({
-              message: `Failed to delete media: ${error.message}`,
-              kind: 'danger',
-              dismissAfter: 8000,
-            }),
+            notifSend(failToDeleteMediaNotification(error.message)),
           );
           return dispatch(mediaDeleteFailed({ privateUpload }));
         });
@@ -209,11 +219,7 @@ export function deleteMedia(file, opts = {}) {
       .catch(error => {
         console.error(error);
         dispatch(
-          notifSend({
-            message: `Failed to delete media: ${error.message}`,
-            kind: 'danger',
-            dismissAfter: 8000,
-          }),
+          notifSend(failToDeleteMediaNotification(error.message)),
         );
         return dispatch(mediaDeleteFailed());
       });
