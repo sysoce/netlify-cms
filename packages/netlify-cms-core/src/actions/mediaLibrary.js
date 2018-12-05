@@ -164,7 +164,10 @@ export function persistMedia(file, opts = {}) {
       console.error(error);
       dispatch(
         notifSend({
-          message: `Failed to persist media: ${error}`,
+          message: {
+            details: error,
+            key: 'ui.toast.onFailToPersistMedia',
+          },
           kind: 'danger',
           dismissAfter: 8000,
         }),
@@ -173,6 +176,17 @@ export function persistMedia(file, opts = {}) {
     }
   };
 }
+
+const failToDeleteMediaNotification = (details) => {
+  return {
+    message: {
+      details: details,
+      key: 'ui.toast.onFailToDeleteMedia',
+    },
+    kind: 'danger',
+    dismissAfter: 8000,
+  };
+};
 
 export function deleteMedia(file, opts = {}) {
   const { privateUpload } = opts;
@@ -191,11 +205,7 @@ export function deleteMedia(file, opts = {}) {
         .catch(error => {
           console.error(error);
           dispatch(
-            notifSend({
-              message: `Failed to delete media: ${error.message}`,
-              kind: 'danger',
-              dismissAfter: 8000,
-            }),
+            notifSend(failToDeleteMediaNotification(error.message)),
           );
           return dispatch(mediaDeleteFailed({ privateUpload }));
         });
@@ -209,11 +219,7 @@ export function deleteMedia(file, opts = {}) {
       .catch(error => {
         console.error(error);
         dispatch(
-          notifSend({
-            message: `Failed to delete media: ${error.message}`,
-            kind: 'danger',
-            dismissAfter: 8000,
-          }),
+          notifSend(failToDeleteMediaNotification(error.message)),
         );
         return dispatch(mediaDeleteFailed());
       });
