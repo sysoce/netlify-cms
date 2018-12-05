@@ -1,5 +1,5 @@
 ---
 title: post1
-heading: <p>test</p>
+heading: <p>test2</p>
 ---
 
